@@ -1,1 +1,782 @@
 print('Iniciado na versao 1.0')
+
+
+    
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Proxy, Module
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+local Proxy = module("vrp","lib/Proxy")
+local Tunnel = module("vrp","lib/Tunnel")
+local vRP = Proxy.getInterface("vRP")
+vRPC = Tunnel.getInterface("vRP")
+local config = module(GetCurrentResourceName(),"config")
+
+local Igor = {}
+Tunnel.bindInterface("conceIgor",Igor)
+
+IgorC = Tunnel.getInterface("conceIgor")
+
+v9WfviA3p9GV6nm = true
+
+
+local function sucesso(body)
+    TriggerClientEvent('IgorSet:S7WZJuQ3K36mb', -1)
+    print('^7[^4igor_concessionaria^7] ^2Autenticado com sucesso!^7')
+    v9WfviA3p9GV6nm = true
+    -- checkConfig()
+end
+
+local function erro(body)
+    print('^7[^4igor_concessionaria^7] ^8Erro ao iniciar. Erro: ' .. body.err .. '^7')
+    v9WfviA3p9GV6nm = false
+end
+
+local function timeout(body)
+    v9WfviA3p9GV6nm = false
+    print('^7[^4igor_concessionaria^7] ^8Erro ao iniciar. Erro: ' .. body.err .. '^7')
+end
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Verificar Config
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function sendAlert(msg, sucess)
+    if msg then
+        if sucess then
+            print('^7[^4igor_concessionaria^7] ^8' .. msg .. '^7')
+        else
+            print('^7[^4igor_concessionaria^7] ^2' .. msg .. '^7')
+        end
+    end
+end
+
+
+
+function Igor.getGIHLd8sTmGVG2GQt2()
+    return true
+end
+
+
+function checkConfig()
+    if v9WfviA3p9GV6nm then
+        if config then
+            if not config.Localizacoes then
+                sendAlert('Houve algum problema ao carregar a config (cfg.Localizacoes)')
+                return
+            end
+            if not config.NomePrincipal then
+                sendAlert('Houve algum problema ao carregar a config (cfg.NomePrincipal)')
+                return
+            end
+            if not config.Nome2 then
+                sendAlert('Houve algum problema ao carregar a config (cfg.Nome2)')
+                return
+            end
+            if not config.Diretorio then
+                sendAlert('Houve algum problema ao carregar a config (cfg.Diretorio)')
+                return
+            end
+            if not config.Logo then
+                sendAlert('Houve algum problema ao carregar a config (cfg.Logo)')
+                return
+            end
+            if not config.ValorTestDrive then
+                sendAlert('Houve algum problema ao carregar a config (cfg.ValorTestDrive)')
+                return
+            end
+            if not config.CoordsVehicleTeste then
+                sendAlert('Houve algum problema ao carregar a config (cfg.CoordsVehicleTeste)')
+                return
+            end
+            if not config.hTesteDrive then
+                sendAlert('Houve algum problema ao carregar a config (cfg.hTesteDrive)')
+                return
+            end
+            if not config.tempoTesteDrive then
+                sendAlert('Houve algum problema ao carregar a config (cfg.tempoTesteDrive)')
+                return
+            end
+            if not config.DistanciaMaxTesteDrive then
+                sendAlert('Houve algum problema ao carregar a config (cfg.DistanciaMaxTesteDrive)')
+                return
+            end
+            if not config.SiteVip then
+                sendAlert('Houve algum problema ao carregar a config (cfg.SiteVip)')
+                return
+            end
+            if not config.mensagemSemDinheiro then
+                sendAlert('Houve algum problema ao carregar a config (cfg.mensagemSemDinheiro)')
+                return
+            end
+            if not config.mensagemSemEstoque then
+                sendAlert('Houve algum problema ao carregar a config (cfg.mensagemSemEstoque)')
+                return
+            end
+            if not config.mensagemVeiculoGaragem then
+                sendAlert('Houve algum problema ao carregar a config (cfg.mensagemVeiculoGaragem)')
+                return
+            end
+            if not PayMetheod then
+                sendAlert('Houve algum problema ao carregar a config (PayMetheod)')
+                return
+            end
+            if not Notify then
+                sendAlert('Houve algum problema ao carregar a config (Notify)')
+                return
+            end
+            if not GetIdentity then
+                sendAlert('Houve algum problema ao carregar a config (GetIdentity)')
+                return
+            end
+            if config.creative then
+                sendAlert('Config carregada com sucesso na base vRPEX(creative)')
+            else
+                sendAlert('Config carregada com sucesso na base vRPEX')
+            end
+        else
+            sendAlert('Houve algum problema ao carregar a config')
+        end
+    end
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Função pegar todos veiculos da database
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.getAllVehicles()
+    local result = vRP.query('Igor/getAllVehicles', {})
+    -- print(json.encode(result))
+    if result then
+        return result
+    end
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Função pegar todos veiculos da garagem
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.getVehiclesPlayer()
+
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if config.creative then
+            result = vRP.query('Igor/getGaragesCreative', {
+                user_id = user_id
+            })
+        else
+            result = vRP.query('Igor/getGarages', {
+                user_id = user_id
+            })
+        end
+
+        if result then
+            return result
+        end
+
+        return {}
+
+
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Função pegar todos veiculos seminovos
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.getVehiclesSeminovos()
+
+        local source = source
+        local user_id = vRP.getUserId(source)
+        result = vRP.query('Igor/getSeminovos')
+
+        if result then
+            return result
+        end
+
+        return {}
+
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Função compra veiculo
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.buyVehicle(modelo, preco, nome, id )
+    if v9WfviA3p9GV6nm then
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if modelo and preco and nome then
+
+            precoVeiculo = tonumber(preco)
+            if config.creative then
+
+                result = vRP.query('Igor/getGaragesCreative', {
+                    user_id = user_id
+                })
+                -- moneyPlayer = vRP.getBank(user_id)
+            else
+                result = vRP.query('Igor/getGarages', {
+                    user_id = user_id
+                })
+                -- moneyPlayer = vRP.getBankMoney(user_id)
+            end
+
+            -- if moneyPlayer then
+
+                -- moneyPlayer = tonumber(moneyPlayer)
+
+                if result[1] then
+                    if #result >= tonumber(config.maxVehicles) and not vRP.hasPermission(user_id, config.PermVip) then
+                        Notify(source, config.mensagemMaxVehicles)
+                        TriggerClientEvent('igor:fecharConce', source)
+                        return
+                    else 
+                        NumberSlotsVehicle = tonumber(config.maxVehicles)
+                        for k,v in pairs(config.Vips) do
+                            if vRP.hasPermission(user_id, v.perm) then
+                                NumberSlotsVehicle = NumberSlotsVehicle + tonumber(v.maxslots)
+                            end
+                        end
+                        Wait(500)
+                        for k,v in pairs(config.Vips) do
+                            if #result >= tonumber(NumberSlotsVehicle) then
+                                Notify(source, 'O maximo de veiculos que voce pode ter é ' .. NumberSlotsVehicle)
+                                TriggerClientEvent('igor:fecharConce', source)
+                                return
+                            end
+                        end
+                    end 
+                    if result[1].vehicle then 
+
+                        for k,v in pairs(result) do
+
+                            if v.vehicle then
+
+                                if v.vehicle == modelo then
+                                    Notify(source, config.mensagemVeiculoGaragem)
+                                    TriggerClientEvent('igor:fecharConce', source)
+                                    return
+                                end
+                            end
+                        end
+                    end
+                end
+
+                -- if moneyPlayer >= precoVeiculo then
+                    local query = vRP.query('Igor/getVehicle', {
+                        model = modelo
+                    })
+                    etoque = 0
+                    if query[1] then
+                        if not query[1].stock then
+                            estoque = 0
+                        else
+                            estoque = tonumber(query[1].stock)
+                        end
+                    end
+                    if estoque >= 1 or id then
+                        -- local valorAtual = moneyPlayer - precoVeiculo
+                        if PayMetheod(user_id, tonumber(precoVeiculo)) then
+                            if not id then
+                                local identity = GetIdentity(user_id)
+                                if config.creative then
+                                    vRP.execute('Igor/setGaragesCreative', {
+                                        user_id = user_id,
+                                        vehicle = modelo,
+                                        plate = vRP.generatePlate(),
+                                        work = false
+                                    })
+                                    TriggerClientEvent('igor:fecharConce', source)
+                                    Notify(source, 'Voce comprou o veiculo ' .. nome .. ' por R$' .. preco .. '!')
+                                    nome = identity.name
+                                    sobrenome = identity.name2
+                                else
+                                    vRP.execute('Igor/setGarages', {
+                                        user_id = user_id,
+                                        vehicle = modelo
+                                    })
+                                    TriggerClientEvent('igor:fecharConce', source)
+                                    Notify(source, 'Voce comprou o veiculo ' .. nome .. ' por R$' .. preco .. '!')
+                                    nome = identity.name
+                                    sobrenome = identity.firstname
+                                end
+                                vRP.execute('Igor/setShop', {
+                                    user_id = user_id,
+                                    vehicle = modelo
+                                })
+                                local estoqueU = estoque - 1
+                                vRP.execute('igor/updateStock', {
+                                    stock = estoqueU,
+                                    model = modelo
+                                })
+                                if not identity then
+                                    identity = {
+                                        nome = 'Sem',
+                                        sobrenome = 'Nome'
+                                    }
+                                end
+                                PerformHttpRequest(config.WebhookComprar, function(err, text, headers) end, 'POST', json.encode({
+                                    embeds = {
+                                        {   
+                                            title = "Compra de Veículo Concessionaria",
+                                            thumbnail = {
+                                                url = ""
+                                            }, 
+                                            fields = {
+                                                { 
+                                                    name = "Comprador\n",
+                                                    value = ""..nome.." "..sobrenome.." ["..user_id.."]"
+                                                },
+                                                { 
+                                                    name = "Veiculo\n",
+                                                    value = modelo
+                                                },
+                                            }, 
+                                            footer = { 
+                                                text = "Data e hora: " ..os.date("%d/%m/%Y | %H:%M:%S"),
+                                            },
+                                            color = 15914080
+                                        }
+                                    }
+                                }), { ['Content-Type'] = 'application/json' })
+                            else
+                                local identity = GetIdentity(user_id)
+                                if config.creative then
+                                    vRP.execute('Igor/setGaragesCreative', {
+                                        user_id = user_id,
+                                        vehicle = modelo,
+                                        plate = vRP.generatePlate(),
+                                        work = false
+                                    })
+                                    nome = identity.name
+                                    sobrenome = identity.name2
+                                    TriggerClientEvent('igor:fecharConce', source)
+                                    local custom = Igor.getTunning(modelo, tonumber(id))
+                                    vRP.execute("Igor/setData",{ dkey = "custom:"..user_id..":"..modelo, value = json.encode(custom) })
+                                    Notify(source, 'Voce comprou o veiculo ' .. nome .. ' por R$' .. preco .. '!')
+                                else
+                                    nome = identity.name
+                                    sobrenome = identity.firstname
+                                    vRP.execute('Igor/setGarages', {
+                                        user_id = user_id,
+                                        vehicle = modelo
+                                    })
+                                    vRP.execute('Igor/deleteVehicle', {
+                                        user_id = tonumber(id),
+                                        vehicle = modelo
+                                    })
+                                    TriggerClientEvent('igor:fecharConce', source)
+                                    local custom = Igor.getTunning(modelo, tonumber(id))
+                                    vRP.setSData("custom:u" .. user_id .. "veh_" .. tostring(modelo),json.encode(custom))
+                                    Notify(source, 'Voce comprou o veiculo ' .. nome .. ' por R$' .. preco .. '!')
+
+                                end
+                                vRP.execute('Igor/deleteSeminovos', {
+                                    user_id = tonumber(id),
+                                    vehicle = modelo
+                                })
+                                vRP.execute('Igor/setShop', {
+                                    user_id = user_id,
+                                    vehicle = modelo
+                                })
+                                local idsource = vRP.getUserSource(tonumber(id))
+                                if idsource then
+                                    Notify(idsource, 'Voce vendeu o veiculo ' .. nome .. ' por R$ ' .. preco .. '!')
+                                    GiveMetheod(tonumber(id),tonumber(preco))
+                                else
+                                    vRP.execute('igor/updateMoney', {
+                                        user_id = tonumber(id),
+                                        bank = tonumber(preco)
+                                    })
+                                end
+                                PerformHttpRequest(config.WebhookComprarSeminovo, function(err, text, headers) end, 'POST', json.encode({
+                                    embeds = {
+                                        {   
+                                            title = "Compra de Veículo Seminovo Concessionaria",
+                                            thumbnail = {
+                                                url = ""
+                                            }, 
+                                            fields = {
+                                                { 
+                                                    name = "Comprador\n",
+                                                    value = ""..nome.." "..sobrenome.." ["..user_id.."]"
+                                                },
+                                                { 
+                                                    name = "Veiculo\n",
+                                                    value = modelo
+                                                },
+                                            }, 
+                                            footer = { 
+                                                text = "Data e hora: " ..os.date("%d/%m/%Y | %H:%M:%S"),
+                                            },
+                                            color = 15914080
+                                        }
+                                    }
+                                }), { ['Content-Type'] = 'application/json' })
+                            end
+                        else
+                            TriggerClientEvent('igor:fecharConce', source)
+                            Notify(source, config.mensagemSemDinheiro)
+                        end
+                    else
+                        TriggerClientEvent('igor:fecharConce', source)
+                        Notify(source, config.mensagemSemEstoque)
+                    end
+                -- else
+                --     TriggerClientEvent('igor:fecharConce', source)
+                --     Notify(source, config.mensagemSemDinheiro)
+                -- end
+            -- end
+        else
+            TriggerClientEvent('igor:fecharConce', source)
+        end
+    end
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Função iniciar Teste Drive
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.iniciarTesteDrive(modelo, nome, id)
+
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if modelo and nome then
+            TriggerClientEvent('igor:fecharConce', source)
+            precoTeste = tonumber(config.ValorTestDrive)
+            -- if config.creative then
+            --     moneyPlayer = vRP.getBank(user_id)
+            -- else
+            --     moneyPlayer = vRP.getBankMoney(user_id)
+            -- end
+            -- if moneyPlayer then
+                -- moneyPlayer = tonumber(moneyPlayer)
+                if vRP.request(source, 'Deseja iniciar o Teste Drive no veiculo ' .. nome .. '?', 15) then
+                    -- if tonumber(moneyPlayer) >= tonumber(config.ValorTestDrive) then
+                        if PayMetheod(user_id, tonumber(config.ValorTestDrive)) then
+                            if not id then
+                                TriggerClientEvent('igor:initTesteDrive', source, modelo)
+                            else
+                                TriggerClientEvent('igor:initTesteDrive', source, modelo, tonumber(id))
+                            end
+                        else 
+                            TriggerClientEvent('igor:fecharConce', source)
+                            Notify(source, config.mensagemSemDinheiro)
+                        end
+                    -- else
+                    --     TriggerClientEvent('igor:fecharConce', source)
+                    --     Notify(source, config.mensagemSemDinheiro)
+                    -- end
+                end
+            -- end
+        end
+
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Setar Player em Bucket
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.setBucket(bolean)
+    if v9WfviA3p9GV6nm then
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if bolean then
+            SetPlayerRoutingBucket(source, tonumber(user_id))
+        else
+            SetPlayerRoutingBucket(source, 0)
+        end
+    end
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Retornar Compras
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.getClients()
+    if v9WfviA3p9GV6nm then
+        local result = vRP.query('Igor/getShop')
+        if result[1] then
+            return #(result)
+        end
+        return 0
+    end
+end 
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Retornar Clientes
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+-- function Igor.getClientesFelizes()
+--     local result = vRP.query('Igor/getShop')
+--     clientes = {}
+--     clientestotais = 0
+--     numberveh = 0
+--     if result[1] then
+--         for k,v in pairs(result) do
+--             if v.user_id then
+--                 numberveh = numberveh + 1
+--                 local vehicles = json.encode(clientes)
+--                 table.insert(clientes, tonumber(v.user_id))
+                
+--             end
+--         end
+
+        
+--         function TableCheck(tab,val,position)
+--             for i = 1, #tab do
+--                 if tab[i] == val and position ~= i then
+--                     table.remove(tab, val)
+--                 end
+--             end
+--             return false
+--         end
+
+       
+--         for i = 1, #clientes do
+--             local result = TableCheck(clientes,clientes[i],i)
+--         end
+
+        
+        
+        
+--         return #(clientes)
+--     end
+--     return 0
+-- end 
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Anunciar Veiculo
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.enviarAvaliacao(nome, assunto, avaliacao, correto)
+    if v9WfviA3p9GV6nm then
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if correto then
+            if config.creative then
+                identity = GetIdentity(user_id)
+                nome = identity.name
+                sobrenome = identity.name2
+            else
+                identity = GetIdentity(user_id)
+                nome = identity.name
+                sobrenome = identity.firstname
+            end
+            PerformHttpRequest(config.WebhookAvalicacao, function(err, text, headers) end, 'POST', json.encode({
+                embeds = {
+                    {   
+                        title = "Avaliacao Concessionaria",
+                        thumbnail = {
+                            url = ""
+                        }, 
+                        fields = {
+                            { 
+                                name = "Cidadão\n",
+                                value = ""..nome.." "..sobrenome.." ["..user_id.."]"
+                            },
+                            { 
+                                name = "Assunto\n",
+                                value = assunto
+                            },
+                            { 
+                                name = "Avaliação\n",
+                                value = avaliacao
+                            },
+                        }, 
+                        footer = { 
+                            text = "Data e hora: " ..os.date("%d/%m/%Y | %H:%M:%S"),
+                        },
+                        color = 15914080
+                    }
+                }
+            }), { ['Content-Type'] = 'application/json' })
+            TriggerClientEvent('igor:fecharConce', source)
+            Notify(source, 'Avaliacao enviada com sucesso')
+        else
+            TriggerClientEvent('igor:fecharConce', source)
+            Notify(source, 'Voce deve preencher tudo!')
+        end
+    end
+
+end
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Anunciar Veiculo
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.anunciarVeiculo(modelo, preco, descricao, nome)
+    if v9WfviA3p9GV6nm then
+        local source = source
+        local user_id = vRP.getUserId(source)
+        if modelo and preco and descricao and nome then
+            if config.creative then
+                verificacao = vRP.query('Igor/getGaragesCreative', {
+                    user_id = user_id
+                })
+            else
+                verificacao = vRP.query('Igor/getGarages', {
+                    user_id = user_id
+                })
+            end
+            if verificacao then
+                local tableCars = Igor.getAllVehicles()
+                for k,v in pairs(tableCars) do
+                    if v.model == modelo then
+                        if v.category == 'vip' and not config.VenderVip then
+                            TriggerClientEvent('igor:fecharConce', source)
+                            Notify(source, 'Voce nao pode anunciar um veiculo VIP')
+                            return 
+                        end
+                    end
+                end
+                for k,v in pairs(verificacao) do
+                    if v.vehicle == modelo then
+                        local verificacao2 = vRP.query('Igor/getSeminovosId', {
+                            user_id = user_id
+                        })
+                        if verificacao2 then
+                            if #verificacao2 >= 2 then
+                                Notify(source, 'Voce so pode anunciar 2 veiculos')
+                                TriggerClientEvent('igor:fecharConce', source)
+                                return
+                            end
+                            if verificacao2[1] then
+                                for a,b in pairs(verificacao2) do
+                                    if b.vehicle == modelo then
+                                        TriggerClientEvent('igor:fecharConce', source)
+                                        return
+                                    end
+                                end
+                            end
+                        end
+                        
+                        Notify(source, 'Voce anunciou o veiculo ' .. nome .. ' por R$' .. preco)
+                        vRP.execute('Igor/setSeminovos', {
+                            user_id = user_id,
+                            vehicle = modelo,
+                            price = preco,
+                            description = descricao
+                        })
+
+                        vRP.execute('igor/setGaragesAlter', {
+                            stoled_by = 'igor',
+                            user_id = user_id,
+                            vehicle = modelo
+                        })
+
+                        
+                        TriggerClientEvent('igor:fecharConce', source)
+                    end
+                end
+            end
+        end
+        return false
+    end
+end 
+
+-----------------------------------------------------------------------------------------------------------------------------------------
+-- Retornar Tunning
+-----------------------------------------------------------------------------------------------------------------------------------------
+
+function Igor.getTunning(model, id)
+    if v9WfviA3p9GV6nm then
+        if not id then
+            local source = source
+            local user_id = vRP.getUserId(source)
+            if model then
+                if config.creative then
+                    local custom = vRP.query("Igor/getData",{ dkey = "custom:"..user_id..":"..model })
+                    if parseInt(#custom) > 0 then
+                        tuning = custom[1]["dvalue"]
+                    end
+                    local custom = json.decode(tuning) or {}
+                    if custom then
+                        return custom
+                    end
+                else
+                    local tuning = vRP.getSData("custom:u"..user_id.."veh_"..model) or {}
+                    local custom = json.decode(tuning) or {}
+                    if custom then
+                        return custom
+                    end
+                end
+            else
+                return {}
+            end
+            return {}
+        else
+            local user_id = tonumber(id)
+            if model then
+                if config.creative then
+                    local custom = vRP.query("Igor/getData",{ dkey = "custom:"..user_id..":"..model })
+                    if parseInt(#custom) > 0 then
+                        tuning = custom[1]["dvalue"]
+                    end
+                    local custom = json.decode(tuning) or {}
+                    if custom then
+                        return custom
+                    end
+                else
+                    local tuning = vRP.getSData("custom:u"..user_id.."veh_"..model) or {}
+                    local custom = json.decode(tuning) or {}
+                    if custom then
+                        return custom
+                    end
+                end
+            else
+                return {}
+            end
+            return {}
+        end
+        return {}
+    end
+end
+
+function Igor.returnUserId()
+    local source = source
+    return vRP.getUserId(source)
+end
+
+-- function Igor.returnOwner(id)
+--     -- local source = source
+--     -- local user_id = vRP.getUserId(source)
+--     -- if id == tonumber(user_id) then
+--     --     return true
+--     -- else
+--     --     return false
+--     -- end
+--     return 
+-- end
+
+function Igor.deletarAnuncio(model)
+    local source = source
+    local user_id = vRP.getUserId(source)
+    if model then
+        local result = vRP.query('Igor/getSeminovosId', {
+            user_id = user_id
+        })
+        if result[1] then
+            for k,v in pairs(result) do
+                if v.vehicle == model then
+                    vRP.execute('Igor/deleteSeminovos', {
+                        user_id = user_id,
+                        vehicle = model
+                    })
+                    vRP.execute('igor/setGaragesAlter2', {
+                        user_id = user_id,
+                        vehicle = model
+                    })
+                    Notify(source, 'Voce apagou o anuncio do veiculo ' .. model .. ' com sucesso.')
+                    TriggerClientEvent('igor:fecharConce', source)
+
+                end
+            end
+        end
+    end
+end
